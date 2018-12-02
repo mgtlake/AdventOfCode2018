@@ -29,32 +29,31 @@ fn part_one(lines: &Vec<String>) {
     println!("{}", count_2 * count_3);
 }
 
-fn n_repeats(str: &String, n: i32) -> bool {
+fn n_repeats(line: &String, n: i32) -> bool {
     let mut freq: HashMap<char, i32> = HashMap::new();
 
-    for c in str.chars() {
-        let cur = *freq.entry(c).or_insert(0);
-        freq.insert(c, cur + 1);
+    for c in line.chars() {
+        *freq.entry(c).or_insert(0) += 1;
     }
 
     return freq.values().any(|count| *count == n);
 }
 
 fn part_two(lines: &Vec<String>) {
-    for line in lines {
-        for other in lines {
-            if almost_equals(line, other) {
-                println!(
-                    "{}",
-                    line.chars()
-                        .zip(other.chars())
-                        .filter(|(c1, c2)| c1 == c2)
-                        .map(|(c, _)| c)
-                        .format("")
-                );
-                return;
-            }
-        }
+    for (line, other) in lines
+        .iter()
+        .cartesian_product(lines)
+        .filter(|(line, other)| almost_equals(line, other))
+    {
+        println!(
+            "{}",
+            line.chars()
+                .zip(other.chars())
+                .filter(|(c1, c2)| c1 == c2)
+                .map(|(c, _)| c)
+                .format("")
+        );
+        return;
     }
 }
 
