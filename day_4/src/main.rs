@@ -16,15 +16,12 @@ fn main() {
         .map(|line| line.expect("Line could not be read"))
         .filter(|line| line.len() > 0)
         .collect::<Vec<String>>();
-
-    lines.iter().map(|line| line.trim());
-
     lines.sort();
 
-    println!("{}", part_one(&lines));;
+    part_one_and_two(&lines);
 }
 
-fn part_one(lines: &Vec<String>) -> usize {
+fn part_one_and_two(lines: &Vec<String>) {
     let mut sleeping = HashMap::new();
 
     let date_time = Regex::new(r"\-(\d{2})\-(\d{2}) (\d{2}):(\d{2})").unwrap();
@@ -41,9 +38,6 @@ fn part_one(lines: &Vec<String>) -> usize {
         let date_time_caps = date_time
             .captures(line)
             .expect("Line should contain a date");
-        let month = cap_number(&date_time_caps, 1);
-        let day = cap_number(&date_time_caps, 2);
-        let hour = cap_number(&date_time_caps, 3);
         let minute = cap_number(&date_time_caps, 4);
 
         if begin.is_match(line) {
@@ -60,44 +54,31 @@ fn part_one(lines: &Vec<String>) -> usize {
         }
     }
 
-    for (k, v) in sleeping.iter() {
-        let peak = v
+    println!(
+        "{}",
+        sleeping
             .iter()
-            .enumerate()
-            .max_by_key(|(_, v)| *v)
-            .map(|(i, _)| i)
-            .unwrap();
-        println!(
-            "{} - sum {}, peak {}",
-            k,
-            //v.iter().fold(0, |sum, s| sum + if s > &0 { 1 } else { 0 }),
-            v.iter().fold(0, |sum, s| sum + s),
-            peak
-        );
-        println!(
-            "{} {}",
-            k,
-            v.iter()
-                .map(|c| match c {
-                    0 => ".",
-                    _ => "#",
-                }).collect::<Vec<&str>>()
-                .join("")
-        )
-    }
-
-    return sleeping
-        .iter()
-        .max_by_key(|(_, v)| v.iter().fold(0, |sum, s| sum + s))
-        .map(|(k, v)| {
-            (
+            // Get guard who spent largest total time asleep
+            .max_by_key(|(_, v)| v.iter().fold(0, |sum, s| sum + s))
+            // Get the time they were most often asleep
+            .map(|(k, v)| (
                 k,
-                v.iter()
-                    .enumerate()
-                    .max_by_key(|(_, v)| *v)
-                    .map(|(i, _)| i)
-                    .unwrap(),
-            )
-        }).map(|(k, v)| k * v)
-        .unwrap();
+                v.iter().position(|r| r == v.iter().max().unwrap()).unwrap(),
+            )).map(|(k, v)| k * v)
+            .unwrap()
+    );
+
+    println!(
+        "{}",
+        sleeping
+            .iter()
+            // Get guard who slept most on the same minute across days
+            .max_by_key(|(_, v)| v.iter().max())
+            // Get that minute
+            .map(|(k, v)| (
+                k,
+                v.iter().position(|r| r == v.iter().max().unwrap()).unwrap()
+            )).map(|(k, v)| k * v)
+            .unwrap()
+    );
 }
