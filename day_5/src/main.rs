@@ -26,18 +26,20 @@ fn part_one(input: &str) -> usize {
 fn part_two(input: &str) -> usize {
     let mut elems = input
         .chars()
-        .map(|e| e.to_lowercase().collect::<Vec<_>>()[0])
-        .collect::<Vec<char>>();
+        .map(|e| e.to_lowercase().collect::<Vec<_>>())
+        .collect::<Vec<_>>();
     elems.sort();
     elems.dedup();
+
+    let reduced = react_reduce(input);
 
     return elems
         .iter()
         .map(|e| {
             react_reduce(
-                &input
+                &reduced
                     .chars()
-                    .filter(|c| c.to_lowercase().collect::<Vec<_>>()[0] != *e)
+                    .filter(|c| c.to_lowercase().collect::<Vec<_>>() != *e)
                     .collect::<String>(),
             ).len()
         }).min()
