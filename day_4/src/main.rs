@@ -24,7 +24,7 @@ fn main() {
 fn part_one_and_two(lines: &Vec<String>) {
     let mut sleeping = HashMap::new();
 
-    let date_time = Regex::new(r"\-(\d{2})\-(\d{2}) (\d{2}):(\d{2})").unwrap();
+    let date_time = Regex::new(r"\-\d{2}\-\d{2} \d{2}:(\d{2})").unwrap();
     let begin = Regex::new(r"Guard #(\d*)").unwrap();
     let sleep = Regex::new(r"falls asleep").unwrap();
     let wake = Regex::new(r"wakes up").unwrap();
@@ -38,7 +38,7 @@ fn part_one_and_two(lines: &Vec<String>) {
         let date_time_caps = date_time
             .captures(line)
             .expect("Line should contain a date");
-        let minute = cap_number(&date_time_caps, 4);
+        let minute = cap_number(&date_time_caps, 1);
 
         if begin.is_match(line) {
             guard = Some(cap_number(&(begin.captures(line).unwrap()), 1));
@@ -59,7 +59,7 @@ fn part_one_and_two(lines: &Vec<String>) {
         sleeping
             .iter()
             // Get guard who spent largest total time asleep
-            .max_by_key(|(_, v)| v.iter().fold(0, |sum, s| sum + s))
+            .max_by_key(|(_, v)| v.iter().sum::<usize>())
             // Get the time they were most often asleep
             .map(|(k, v)| (
                 k,
